@@ -10,7 +10,7 @@ color: #f8fafc
 
 ## **Curriculum + Trust: The Mastery-Gated AI Project Accelerator**
 
-<italic>Turning Project Ideas into Verified, Time-Boxed, Completable Modules</italic>
+_Turning Project Ideas into Verified, Time-Boxed, Completable Modules_
 
 **Tech Stack:** HTML5 / CSS3 / Vanilla JS • FastAPI • Tavily API • Scikit-Learn ML • Gemini 2.5
 
@@ -30,7 +30,7 @@ You input **5 parameters**:
 
 1. **Project Name & Brief Description**
 2. **Available Hours / Day** & **Hard Deadline**
-3. **Current Level of Understanding** *(Beginner / Intermediate / Advanced)*
+3. **Current Level of Understanding** _(Beginner / Intermediate / Advanced)_
 
 **CurryKrust outputs a locked sequence of completable modules:**
 `Verified Theory` $\rightarrow$ `Immediate Practice` $\rightarrow$ `5-Q Quiz` $\rightarrow$ `Mini-Project` $\rightarrow$ `Final AI Evaluation (80% to Unlock Next Module)`
@@ -68,7 +68,7 @@ You input **5 parameters**:
 
 ## 6. Competitive Advantage
 
-| Feature | Course Generators *(Coursebox)* | Coding Platforms *(Hyperskill)* | AI Search *(Perplexity)* | **CurryKrust** |
+| Feature | Course Generators _(Coursebox)_ | Coding Platforms _(Hyperskill)_ | AI Search _(Perplexity)_ | **CurryKrust** |
 | :--- | :---: | :---: | :---: | :---: |
 | **Custom Project + Deadline Input** | ❌ | ❌ | ✅ | **✅** |
 | **ML-Verified External Sources** | ❌ | ❌ | ✅ | **✅** |

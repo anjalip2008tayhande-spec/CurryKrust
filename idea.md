@@ -8,15 +8,15 @@ color: #f8fafc
 
 # **CurryKrust** 🥧
 
-### **Curriculum + Trust: The Mastery-Gated AI Project Accelerator**
+## **Curriculum + Trust: The Mastery-Gated AI Project Accelerator**
 
-*Turning Project Ideas into Verified, Time-Boxed, Completable Modules*
+<italic>Turning Project Ideas into Verified, Time-Boxed, Completable Modules</italic>
 
 **Tech Stack:** HTML5 / CSS3 / Vanilla JS • FastAPI • Tavily API • Scikit-Learn ML • Gemini 2.5
 
 ---
 
-# 1. The Problem: Why Self-Learners Fail Deadlines
+## 1. The Problem: Why Self-Learners Fail Deadlines
 
 * **Search Engine Overload:** Searching "How to build X" dumps 10,000 unverified blog posts with no structure or time management.
 * **AI Hallucination & Passive Reading:** Standard LLMs generate walls of unverified text without checking if the learner actually understood it.
@@ -24,9 +24,10 @@ color: #f8fafc
 
 ---
 
-# 2. The Solution: What is CurryKrust?
+## 2. The Solution: What is CurryKrust?
 
 You input **5 parameters**:
+
 1. **Project Name & Brief Description**
 2. **Available Hours / Day** & **Hard Deadline**
 3. **Current Level of Understanding** *(Beginner / Intermediate / Advanced)*
@@ -36,7 +37,7 @@ You input **5 parameters**:
 
 ---
 
-# 3. How We Combined APIs + ML + AI
+## 3. How We Combined APIs + ML + AI
 
 | Pillar | Implementation | Why It Matters |
 | :--- | :--- | :--- |
@@ -47,7 +48,7 @@ You input **5 parameters**:
 
 ---
 
-# 4. System Workflow (End-to-End Architecture)
+## 4. System Workflow (End-to-End Architecture)
 
 1. **Input & Time Budgeting (JS $\rightarrow$ FastAPI):** Calculates `Total Study Hours = Days × Hours/Day`.
 2. **Credible Material Scraping (API Layer):** Pulls candidate articles & videos from high-authority domains.
@@ -56,7 +57,7 @@ You input **5 parameters**:
 
 ---
 
-# 5. Inside a Single CurryKrust Module
+## 5. Inside a Single CurryKrust Module
 
 * **Step 1: Curated Theory** — Real documentation links with ML Relevance Badges + concise synthesis.
 * **Step 2: Immediate Practice** — A 5-minute hands-on micro-task right inside the browser.
@@ -65,7 +66,7 @@ You input **5 parameters**:
 
 ---
 
-# 6. Competitive Advantage
+## 6. Competitive Advantage
 
 | Feature | Course Generators *(Coursebox)* | Coding Platforms *(Hyperskill)* | AI Search *(Perplexity)* | **CurryKrust** |
 | :--- | :---: | :---: | :---: | :---: |
@@ -76,7 +77,7 @@ You input **5 parameters**:
 
 ---
 
-# 7. Live Demo & Future Scope
+## 7. Live Demo & Future Scope
 
 * **Live Demo Flow:** Input Project $\rightarrow$ Inspect ML Credibility Scores $\rightarrow$ Pass Module 1 Assessment $\rightarrow$ Watch Module 2 Unlock Live!
 * **Next Steps:**

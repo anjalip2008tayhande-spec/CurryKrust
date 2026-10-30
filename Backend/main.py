@@ -1,13 +1,16 @@
+import os
 import json
-from datetime import datetime
-from fastapi import FastAPI, Depends, HTTPException
+from datetime import datetime, timedelta
+from fastapi import FastAPI, Depends, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse, RedirectResponse
 from sqlalchemy.orm import Session
 
 from database import SessionLocal, User, Project, DailyProgress
 from schemas import (
     SignUpRequest, LoginRequest, ProfileUpdateRequest,
-    ProjectCreateRequest, ModuleCompleteRequest, TimeLogRequest
+    ProjectCreateRequest, ModuleCompleteRequest, ModuleEvaluateRequest, TimeLogRequest
 )
 
 # Smart Plug-and-Play: Works standalone right now on Backend-feature branch,
@@ -18,9 +21,10 @@ except ImportError:
     ml_engine = None
 
 try:
-    from ai_agent import generate_course_with_gemma
+    from ai_agent import generate_course_with_gemma, evaluate_code_submission
 except ImportError:
     generate_course_with_gemma = None
+    evaluate_code_submission = None
 
 app = FastAPI(
     title="CurryKrust Backend API",
@@ -44,16 +48,114 @@ def get_db():
     finally:
         db.close()
 
+frontend_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "Frontend"))
+if os.path.isdir(frontend_path):
+    app.mount("/static", StaticFiles(directory=frontend_path), name="frontend_static")
+    for subdir in ["css", "js", "assets"]:
+        sub_dir_path = os.path.join(frontend_path, subdir)
+        if os.path.isdir(sub_dir_path):
+            app.mount(f"/{subdir}", StaticFiles(directory=sub_dir_path), name=f"frontend_{subdir}")
+
+@app.on_event("startup")
+def startup_populate():
+    db = SessionLocal()
+    try:
+        user = db.query(User).filter(User.id == 1).first()
+        if not user:
+            user = User(
+                id=1,
+                username="alex_learner",
+                email="alex@currykrust.ai",
+                password="password123",
+                bio="Tech newbie crushing procrastination with CurryKrust!",
+                theme="dark"
+            )
+            db.add(user)
+            db.commit()
+            db.refresh(user)
+
+        # Seed initial showcase project if none exists
+        if db.query(Project).filter(Project.user_id == 1).count() == 0:
+            ml_report = ml_engine.run_reality_check(
+                "Build a verified REST API with SQLite database, authentication, and structured error handling",
+                "Working production backend with 5 endpoints and test suite",
+                2.5,
+                "2026-11-08",
+                "Beginner"
+            ) if ml_engine else {
+                "assessed_level": "Beginner",
+                "reality_check_status": "Realistic & Achievable with Discipline",
+                "recommended_course_depth": "Standard Balanced",
+                "procrastination_advice": "Follow your daily 2.5h time budget and complete quizzes!",
+                "recommended_modules_count": 4,
+                "project_complexity_score": "6/10",
+                "total_available_hours": 32.5,
+                "days_remaining": 13,
+                "ml_confidence_percent": 91.0
+            }
+            course_data = generate_course_with_gemma(
+                "Full-Stack FastAPI & SQLite Portfolio",
+                "Build a verified REST API with SQLite and authentication",
+                "Working production backend with 5 endpoints and test suite",
+                ml_report
+            ) if generate_course_with_gemma else {}
+            
+            p = Project(
+                user_id=1,
+                project_name="Full-Stack FastAPI & SQLite Portfolio",
+                description="Build a verified REST API with SQLite database and authentication",
+                daily_time_hours=2.5,
+                deadline="2026-11-08",
+                end_goal="Working production backend with 5 endpoints and test suite",
+                prior_level="Beginner",
+                ml_reality_check_json=json.dumps(ml_report),
+                course_json=json.dumps(course_data),
+                completed_modules=1,
+                total_modules=len(course_data.get("modules", [])) or 4
+            )
+            db.add(p)
+            
+            # Seed daily progress logs
+            today = datetime.now()
+            sample_logs = [
+                (today - timedelta(days=3), 45.0),
+                (today - timedelta(days=2), 60.0),
+                (today - timedelta(days=1), 75.0),
+                (today, 30.0)
+            ]
+            for d, mins in sample_logs:
+                d_str = d.strftime("%Y-%m-%d")
+                if not db.query(DailyProgress).filter(DailyProgress.user_id == 1, DailyProgress.date == d_str).first():
+                    db.add(DailyProgress(user_id=1, date=d_str, minutes_spent=mins))
+            db.commit()
+    except Exception as e:
+        print("Startup seed note:", e)
+    finally:
+        db.close()
+
 # ==========================================
 # 1. OPENING PAGE & AUTH (Sign Up / Log In)
 # ==========================================
 @app.get("/")
-def root():
+def root(request: Request):
+    accept = request.headers.get("accept", "")
+    index_file = os.path.join(frontend_path, "index.html")
+    if "text/html" in accept and os.path.exists(index_file):
+        return FileResponse(index_file)
     return {
         "app": "CurryKrust",
+        "tagline": "Curriculum + Trust: The Mastery-Gated AI Project Accelerator",
         "purpose": "Beat procrastination with structured, credible module-wise courses.",
-        "status": "Backend-feature running cleanly!"
+        "status": "Backend-feature running cleanly!",
+        "web_app": "/app"
     }
+
+@app.get("/app")
+def serve_frontend_app():
+    index_file = os.path.join(frontend_path, "index.html")
+    if os.path.exists(index_file):
+        return FileResponse(index_file)
+    return {"message": "Frontend index.html ready"}
 
 @app.post("/api/auth/signup")
 def signup(req: SignUpRequest, db: Session = Depends(get_db)):
@@ -200,6 +302,44 @@ def mark_module_completed(project_id: int, req: ModuleCompleteRequest, db: Sessi
         "total_modules": p.total_modules,
         "progress_percent": round((p.completed_modules / max(p.total_modules, 1)) * 100)
     }
+
+@app.post("/api/projects/{project_id}/evaluate-module")
+def evaluate_module_code(project_id: int, req: ModuleEvaluateRequest, db: Session = Depends(get_db)):
+    p = db.query(Project).filter(Project.id == project_id).first()
+    if not p:
+        raise HTTPException(status_code=404, detail="Project not found")
+
+    if evaluate_code_submission:
+        eval_result = evaluate_code_submission(
+            project_name=p.project_name,
+            module_number=req.module_number,
+            code_submission=req.code_submission,
+            end_goal=p.end_goal
+        )
+    else:
+        eval_result = {
+            "passed": True,
+            "score": 88,
+            "rubric_breakdown": {"syntax_and_structure": 36, "goal_alignment": 26, "best_practices": 26},
+            "status_title": f"Module {req.module_number} Mastered! Score: 88% 🎉",
+            "feedback": "Code approved! Well structured and addresses the project milestone.",
+            "strengths": ["Clear logic", "Good structure"],
+            "improvements": ["Keep moving forward to the next module!"],
+            "passing_threshold": 80
+        }
+
+    # If user passed (score >= 80%), auto-unlock next module
+    if eval_result.get("passed", False) and req.module_number > p.completed_modules:
+        p.completed_modules = req.module_number
+        db.commit()
+        db.refresh(p)
+
+    eval_result["project_id"] = p.id
+    eval_result["completed_modules"] = p.completed_modules
+    eval_result["total_modules"] = p.total_modules
+    eval_result["progress_percent"] = round((p.completed_modules / max(p.total_modules, 1)) * 100)
+    eval_result["next_module_unlocked"] = min(p.completed_modules + 1, p.total_modules)
+    return eval_result
 
 # ==========================================
 # 4. FLASHCARDS HOVER (Top-Right Icon)

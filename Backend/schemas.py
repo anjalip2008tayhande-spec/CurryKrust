@@ -33,6 +33,12 @@ class ProjectCreateRequest(BaseModel):
 class ModuleCompleteRequest(BaseModel):
     module_number: int
 
+# Clipboard 5.1: Checking AI code evaluation submission for Module
+class ModuleEvaluateRequest(BaseModel):
+    module_number: int
+    code_submission: str
+    notes: Optional[str] = ""
+
 # Clipboard 6: Checking Daily Time Spent on App (Progress Page)
 class TimeLogRequest(BaseModel):
     user_id: int

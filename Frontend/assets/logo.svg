@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none">
+  <defs>
+    <linearGradient id="primaryGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#10B981" />
+      <stop offset="50%" stop-color="#06B6D4" />
+      <stop offset="100%" stop-color="#6366F1" />
+    </linearGradient>
+    <linearGradient id="shieldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#3B82F6" stop-opacity="0.8" />
+      <stop offset="100%" stop-color="#10B981" stop-opacity="0.9" />
+    </linearGradient>
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="4" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
+  <!-- Background Aura -->
+  <circle cx="50" cy="50" r="42" fill="url(#primaryGrad)" opacity="0.18" filter="url(#glow)"/>
+  
+  <!-- Outer Shield Crest (Trust) -->
+  <path d="M50 14 L78 26 C78 54 50 78 50 86 C50 78 22 54 22 26 Z" 
+        fill="url(#primaryGrad)" 
+        stroke="rgba(255,255,255,0.4)" 
+        stroke-width="2.5" 
+        stroke-linejoin="round"/>
+        
+  <!-- Inner Shield Layer -->
+  <path d="M50 22 L72 31 C72 52 50 71 50 77 C50 71 28 52 28 31 Z" 
+        fill="#0F172A" 
+        opacity="0.85"/>
+        
+  <!-- Mastery Lightning / Curriculum Spark -->
+  <path d="M53 30 L38 50 L48 50 L45 70 L64 46 L53 46 Z" 
+        fill="url(#primaryGrad)" 
+        filter="url(#glow)"/>
+        
+  <!-- Sparkle Accents -->
+  <circle cx="72" cy="24" r="2.5" fill="#34D399" />
+  <circle cx="28" cy="24" r="2" fill="#38BDF8" />
+  <circle cx="50" cy="88" r="2" fill="#818CF8" />
+</svg>
